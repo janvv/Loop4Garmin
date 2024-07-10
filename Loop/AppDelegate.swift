@@ -9,6 +9,10 @@
 import UIKit
 import LoopKit
 
+extension Notification.Name {
+    static let didReceiveURL = Notification.Name("didReceiveURL")
+}
+
 final class AppDelegate: UIResponder, UIApplicationDelegate, WindowProvider {
     var window: UIWindow?
 
@@ -23,6 +27,17 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, WindowProvider {
         loopAppManager.initialize(windowProvider: self, launchOptions: launchOptions)
         loopAppManager.launch()
         return loopAppManager.isLaunchComplete
+    }
+    
+    func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
+        print("Received URL: \(url)")
+        
+        // Post notification
+        NotificationCenter.default.post(name: .didReceiveURL, object: nil, userInfo: ["url": url, "options": options])
+        NSLog("Received URL: \(url), pushed notification")
+        
+        // Return true if your application can open the URL resource, false otherwise
+        return true
     }
 
     // MARK: - UIApplicationDelegate - Life Cycle
