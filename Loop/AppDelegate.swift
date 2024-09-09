@@ -9,6 +9,11 @@
 import UIKit
 import LoopKit
 
+extension Notification.Name {
+    static let didReceiveURL = Notification.Name("didReceiveURL")
+}
+
+
 final class AppDelegate: UIResponder, UIApplicationDelegate, WindowProvider {
     var window: UIWindow?
 
@@ -28,7 +33,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, WindowProvider {
         loopAppManager.launch()
         return loopAppManager.isLaunchComplete
     }
-
+    
     // MARK: - UIApplicationDelegate - Life Cycle
 
     func applicationDidBecomeActive(_ application: UIApplication) {
@@ -88,7 +93,13 @@ final class AppDelegate: UIResponder, UIApplicationDelegate, WindowProvider {
     
     func application(_ app: UIApplication, open url: URL, options: [UIApplication.OpenURLOptionsKey : Any] = [:]) -> Bool {
         loopAppManager.handle(url)
+    
+        // Post notification (to forward to garmin service)
+        NotificationCenter.default.post(name: .didReceiveURL, object: nil, userInfo: ["url": url, "options": options])
+        NSLog("Received URL: \(url), pushed notification")
+        return true
     }
+
 
     // MARK: - UIApplicationDelegate - Continuity
 
